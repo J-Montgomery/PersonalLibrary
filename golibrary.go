@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -53,7 +54,7 @@ func CustomFileServer(root http.FileSystem, handler404 FSHandler404) http.Handle
 		f, err := root.Open(uri)
 		if err != nil {
 			if os.IsNotExist(err) {
-				fmt.Println("Path not found: " + uri)
+				LogError.Println("Path not found: " + uri)
 				handler404(w, r)
 				return
 			}
@@ -87,7 +88,7 @@ func init() {
 		return
 	}
 
-	fmt.Println("Sqlite3 version: " + version)
+	LogInfo.Println("Sqlite3 version: " + version)
 
 	initializeDB(db)
 
@@ -102,7 +103,7 @@ func main() {
 
 	http.HandleFunc("/api/v1/search", handleSearch)
 
-	fmt.Println("Server is running on http://localhost:8080")
+	LogInfo.Println("Server is running on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -111,13 +112,29 @@ func handlePageNotFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
+	books := make([]Book, 3)
+	books[0] = Book{
+		Title:       "The Go Programming Language",
+		Description: "Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.",
+	}
+
+	books[1] = Book{
+		Title:       "The C Programming Language",
+		Description: "The original K&R C book by Brian W. Kernighan and Dennis M. Ritchie.",
+	}
+
+	books[2] = Book{
+		Title:       "The Rust Programming Language",
+		Description: "A crabby introduction to Rust.",
+	}
+
+	books_json, err := json.Marshal(books)
+	if err != nil {
+		LogError.Println("Converting books to json failed:\n\t", err)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, `[
-		{"title":"Webster's dictionary", "description":"A dictionary" },
-		{"title":"Google dictionary", "description":"Another dictionary" },
-		{"title":"Bing dictionary", "description":"Yet another dictionary" }
-	]`)
+	fmt.Fprintf(w, string(books_json))
 }
 
 func initLoggers() {
