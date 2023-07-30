@@ -5,9 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library</title>
     <style>
+        :root {
+            --dark:#0d1b2a;
+            --dark-mid: #1b263b;
+            --mid: #415a77;
+            --light-mid: #778da9;
+            --light: #e0e1dd;
+            --white: #eee;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: var(--dark-mid);
             margin: 0;
             display: flex;
             align-items: center;
@@ -16,44 +25,58 @@
         }
 
         .library-container {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 20px;
+            background-color: var(--light);
+            border: 1px solid var(--dark);
+            padding: 40px;
             border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
             width: 400px;
             text-align: center;
+            border-radius: 50px;
         }
 
         .search-bar {
-            width: 90%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            width: 100%;
+            border: none;
+            outline: none;
+            background-color: var(--white);
+            text-align: left;
+            font-size: large;
         }
 
         .search-button {
-            background-color: #007BFF;
-            color: #fff;
+            background-color: var(--light-mid);
+            color: white;
             padding: 10px 20px;
-            font-size: 16px;
             border: none;
-            border-radius: 5px;
+            border-radius: 50px;
             cursor: pointer;
+            text-transform: uppercase;
+            font-size: large;
+        }
+
+        form {
+            display: flex;
+            flex-direction: row;
+
+            background-color: var(--white);
+            border: 1px solid #555;
+            padding: 10px;
+            border-radius: 50px;
         }
 
         .search-button:hover {
-            background-color: #0056b3;
+            background-color: var(--dark-mid);
         }
     </style>
 </head>
 <body>
     <div class="library-container">
         <h1>Welcome to the Library</h1>
-        <input type="text" class="search-bar" placeholder="Search for files...">
-        <button class="search-button">Search</button>
+        <form action="/api/v1/search" method="get">
+            <input type="text" class="search-bar" placeholder="Search for files..." />
+            <button class="search-button" type="submit">Search</button>
+        </form>
     </div>
 
     <script>
