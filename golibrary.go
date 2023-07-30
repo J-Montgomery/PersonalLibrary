@@ -1,10 +1,10 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"golibrary/internal/bookdb"
 	"log"
 	"net/http"
 	"os"
@@ -12,26 +12,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 type FSHandler404 = func(w http.ResponseWriter, r *http.Request)
-
-type Book struct {
-	Title           string
-	Author          string
-	Publisher       string
-	FileType        string
-	UploadDate      time.Time
-	PublicationDate string
-	Pages           int
-	Description     string
-	CoverImage      []byte
-	FileData        []byte
-}
-
-var db *sql.DB
+type Book bookdb.Book
 
 var (
 	LogInfo  *log.Logger
@@ -70,38 +54,15 @@ func CustomFileServer(root http.FileSystem, handler404 FSHandler404) http.Handle
 
 func init() {
 	initLoggers()
-
-	db, err := sql.Open("sqlite3", ":memory:")
-
-	if err != nil {
-		LogError.Println(err)
-		return
-	}
-
-	defer db.Close()
-
-	var version string
-	err = db.QueryRow("SELECT SQLITE_VERSION()").Scan(&version)
-
-	if err != nil {
-		LogError.Println(err)
-		return
-	}
-
-	LogInfo.Println("Sqlite3 version: " + version)
-
-	initializeDB(db)
-
+	bookdb.Init()
 }
 
 func main() {
-
-	//---------------------
-
 	frontend := http.StripPrefix("/", CustomFileServer(http.Dir("frontend"), handlePageNotFound))
 	http.Handle("/", frontend)
 
 	http.HandleFunc("/api/v1/search", handleSearch)
+	http.HandleFunc("/api/v1/upload", handleUpload)
 
 	LogInfo.Println("Server is running on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
@@ -135,6 +96,25 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, string(books_json))
+}
+
+func handleUpload(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	book, err := makeBook(r)
+
+	if err != nil {
+		fmt.Fprintf(w, `[ {"Status": "Invalid Request"} ]`)
+		return
+	}
+
+	err = bookdb.InsertBook(bookdb.Book(book))
+	if err != nil {
+		fmt.Fprintf(w, `[ {"Status": "Invalid Request"} ]`)
+		return
+	}
+
+	fmt.Fprintf(w, `[ {"Status": "Book successfully uploaded"} ]`)
 }
 
 func initLoggers() {
@@ -180,70 +160,4 @@ func makeBook(r *http.Request) (Book, error) {
 	book.FileData, _ = getBase64ParamBytes(r, "file")
 
 	return book, nil
-}
-
-func handleUpload(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-	book, err := makeBook(r)
-
-	if err != nil {
-		fmt.Fprintf(w, `[ {"Status": "Invalid Request"} ]`)
-		return
-	}
-	stm, err := db.Prepare(`INSERT INTO books(
-		title, file_type, upload_date, publication_date,
-		publisher, pages, description, author,
-		cover_image, file_data) VALUES(?,?,?,?,?,?,?,?,?,?)`)
-	if err != nil {
-		fmt.Fprintf(w, `[ {"Status": "Unknown Failure"} ]`)
-		LogError.Println("Unable to prepare for book insertion:\n\t", err)
-		return
-	}
-
-	defer stm.Close()
-
-	_, err = stm.Exec(
-		book.Title,
-		book.FileType,
-		book.UploadDate.String(),
-		book.PublicationDate,
-		book.Publisher,
-		book.Pages,
-		book.Description,
-		book.Author,
-		book.CoverImage,
-		book.FileData,
-	)
-
-	if err != nil {
-		fmt.Fprintf(w, `[ {"Status": "Unknown Failure"} ]`)
-		LogError.Println("Unable to insert book:\n\t", err)
-		return
-	}
-
-	fmt.Fprintf(w, `[ {"Status": "Book successfully uploaded"} ]`)
-}
-
-func initializeDB(db *sql.DB) error {
-	stm := `CREATE TABLE IF NOT EXISTS books (
-		book_id INTEGER PRIMARY KEY,
-		title TEXT,
-		file_type TEXT,
-		upload_date TEXT,
-		publication_date TEXT,
-		publisher TEXT,
-		pages INTEGER,
-		description TEXT,
-		author TEXT,
-		cover_image BLOB,
-		file_data BLOB
-	);`
-	_, err := db.Exec(stm)
-
-	if err != nil {
-		LogError.Println("Error creating book table:\n\t", err)
-	}
-
-	return nil
 }
