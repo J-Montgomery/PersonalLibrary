@@ -7,10 +7,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body onload="initialSearch()">
+    <div class="top-bar">
     <div class="search-bar-container">
         <input type="text" class="search-bar" placeholder="Search for files...">
         <button class="search-button" onclick="newSearch()">Search</button>
     </div>
+    </div>
+
+    <div class="results-separator"></div>
 
     <div class="search-results" id="searchResults">
         <!-- Search results will be dynamically added here -->
@@ -20,6 +24,10 @@
         function initialSearch() {
             let params = new URLSearchParams(document.location.search);
             let searchQuery = params.get("query");
+
+            // Set the search query to whatever's in the URL so
+            // the user knows what the results are for
+            document.querySelector(".search-bar").value = searchQuery;
 
             performSearch(searchQuery);
         }
