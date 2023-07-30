@@ -11,7 +11,7 @@ body {
     font-family: Arial, sans-serif;
     background-color: var(--dark-mid);
     margin: 0;
-    display: flex;
+    /* display: flex; */
     align-items: center;
     justify-content: center;
     height: 100vh;
@@ -26,6 +26,13 @@ body {
     width: 400px;
     text-align: center;
     border-radius: 50px;
+}
+
+.search-bar-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 .search-bar {
@@ -64,11 +71,23 @@ body {
     background-color: var(--dark-mid);
 }
 
-.search-results-container {
-    position: absolute;
-    float: right;
-    clear: both;
-    display: block;
-    /* position:  relative;  */
-    margin-top: -100px;
+.search-results {
+    width: 100%;
+}
+
+.search-result {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #fff;
+}
+
+.search-result h2 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.search-result p {
+    margin: 0;
 }

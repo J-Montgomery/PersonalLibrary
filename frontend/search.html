@@ -1,122 +1,10 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .search-result {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 10px;
-            background-color: #fff;
-        }
-
-        .search-result h2 {
-            margin-top: 0;
-            margin-bottom: 5px;
-        }
-
-        .search-result p {
-            margin: 0;
-        }
-    </style>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="library-container">
-        <form action="/search.html" method="get" class="search-form">
-            <input type="text" class="search-bar" placeholder="Search for files..." name="query" />
-            <button class="search-button" type="submit">Search</button>
-        </form>
-    </div>
-
-    <div class="search-results-container">
-        <h1>Search Results</h1>
-        <div class="search-result">
-            <h2>File1.txt</h2>
-            <p>Sample content for File1.txt</p>
-        </div>
-        <div class="search-result">
-            <h2>File2.txt</h2>
-            <p>Sample content for File2.txt</p>
-        </div>
-    </div>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Search</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .search-bar-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .search-bar {
-            width: 300px;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .search-button {
-            background-color: #007BFF;
-            color: #fff;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            margin-left: 10px;
-            cursor: pointer;
-        }
-
-        .search-button:hover {
-            background-color: #0056b3;
-        }
-
-        .search-results {
-            width: 100%;
-        }
-
-        .search-result {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 10px;
-            background-color: #fff;
-        }
-
-        .search-result h2 {
-            margin-top: 0;
-            margin-bottom: 5px;
-        }
-
-        .search-result p {
-            margin: 0;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body onload="initialSearch()">
     <div class="search-bar-container">
@@ -138,6 +26,7 @@
 
         function newSearch() {
             var searchQuery = document.querySelector(".search-bar").value;
+            console.log("searching for " + searchQuery)
             performSearch(searchQuery);
         }
 
