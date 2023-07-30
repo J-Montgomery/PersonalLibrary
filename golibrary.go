@@ -25,6 +25,7 @@ func CustomFileServer(root http.FileSystem, handler404 FSHandler404) http.Handle
 		f, err := root.Open(uri)
 		if err != nil {
 			if os.IsNotExist(err) {
+				fmt.Println("Path not found: " + uri)
 				handler404(w, r)
 				return
 			}
@@ -43,10 +44,22 @@ func main() {
 	frontend := http.StripPrefix("/", CustomFileServer(http.Dir("frontend"), handlePageNotFound))
 	http.Handle("/", frontend)
 
+	http.HandleFunc("/api/v1/search", handleSearch)
+
 	fmt.Println("Server is running on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
 
 func handlePageNotFound(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/404.html", http.StatusSeeOther)
+}
+
+func handleSearch(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintf(w, `[
+		{"title":"Webster's dictionary", "description":"A dictionary" },
+		{"title":"Google dictionary", "description":"Another dictionary" },
+		{"title":"Bing dictionary", "description":"Yet another dictionary" }
+	]`)
 }

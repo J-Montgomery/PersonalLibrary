@@ -48,16 +48,27 @@ body {
     font-size: large;
 }
 
-form {
+.search-form {
     display: flex;
     flex-direction: row;
+    width: 100%;
 
     background-color: var(--white);
     border: 1px solid #555;
     padding: 10px;
     border-radius: 50px;
+    
 }
 
 .search-button:hover {
     background-color: var(--dark-mid);
+}
+
+.search-results-container {
+    position: absolute;
+    float: right;
+    clear: both;
+    display: block;
+    /* position:  relative;  */
+    margin-top: -100px;
 }
