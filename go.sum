@@ -1,2 +1,4 @@
+git.sr.ht/~emersion/go-sqlite3-fts5 v0.0.0-20230217131031-f2c8767594fc h1:+y3OijpLl4rgbFsqMBmYUTCsGCkxQUWpWaqfS8j9Ygc=
+git.sr.ht/~emersion/go-sqlite3-fts5 v0.0.0-20230217131031-f2c8767594fc/go.mod h1:PCl1xjl7iC6x35TKKubKRyo/3TT0dGI66jyNI6vmYnU=
 github.com/mattn/go-sqlite3 v1.14.17 h1:mCRHCLDUBXgpKAqIKsaAaAsrAlbkeomtRFKXh2L6YIM=
 github.com/mattn/go-sqlite3 v1.14.17/go.mod h1:2eHXhiwb8IkHr+BDWZGa96P6+rkvnG63S2DGjv9HUNg=

@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "git.sr.ht/~emersion/go-sqlite3-fts5"
 )
 
 type Book struct {
@@ -29,7 +29,7 @@ var (
 )
 
 func ConnectDB() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "bookdb.db")
+	db, err := sql.Open("sqlite3", ":memory:")
 
 	if err != nil {
 		LogError.Println(err)
@@ -136,4 +136,26 @@ func GetBook(title string) (Book, error) {
 	stm.QueryRow(title).Scan(&book.Title, &book.Description, &book.Author, &book.CoverImage)
 
 	return book, nil
+}
+
+func SearchBooks(query string) ([]Book, error) {
+	var books []Book
+	rows, err := bookDB.Query(`SELECT * from search_index WHERE search_index match ? ORDER BY rank;`, query)
+	if err != nil {
+		LogError.Println("Search query failed:\n\t", err)
+		return books, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var book Book
+		err = rows.Scan(&book.Title, &book.Description)
+		if err != nil {
+			LogError.Println("Search query failed:\n\t", err)
+			return books, err
+		}
+		books = append(books, book)
+	}
+
+	return books, nil
 }

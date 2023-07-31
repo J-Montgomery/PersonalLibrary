@@ -76,13 +76,19 @@ func handlePageNotFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
-	books_json, err := json.Marshal(bookList)
+	query := r.URL.Query().Get("q")
+	results, err := bookdb.SearchBooks(query)
 	if err != nil {
-		LogError.Println("Converting books to json failed:\n\t", err)
+		LogError.Println("Searching books failed:\n\t", err)
+	}
+
+	books_json, err := json.Marshal(results)
+	if err != nil {
+		LogError.Println("Searching books failed:\n\t", err)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, string(books_json))
+	fmt.Fprint(w, string(books_json))
 }
 
 func handleUpload(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +128,7 @@ func handleInfo(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `[ {"Status": "Invalid Request"} ]`)
 	}
 
-	fmt.Fprintf(w, string(book_info_json))
+	fmt.Fprint(w, string(book_info_json))
 }
 
 func initLoggers() {
