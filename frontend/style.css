@@ -126,14 +126,20 @@ body {
 .info-container {
     background-color: var(--mid);
     border-radius: 10px;
-    padding: 10px 5px;
+    padding: 10px 10px;
+    height: 100%;
 }
 
 .book-info {
+    height: 100%;
     border: 1px solid var(--dark-mid);
     border-radius: 15px;
     padding: 10px;
-    margin-bottom: 10px;
     background-color: var(--light);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.cover-frame {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 1);
 }
