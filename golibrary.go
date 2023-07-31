@@ -106,9 +106,11 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 
 func handleInfo(w http.ResponseWriter, r *http.Request) {
 
-	w.Header().Set("Content-Type", "application/json")
-	book, err := bookdb.GetBook(r.URL.Query().Get("title"))
+	// FileServer mangles query parameters randomly. title -> q, apparently
+	title := r.URL.Query().Get("q")
+	book, err := bookdb.GetBook(title)
 
+	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
 		fmt.Fprintf(w, `[ {"Status": "Invalid Request"} ]`)
 		return
@@ -186,6 +188,7 @@ func initBooklist() {
 	}
 
 	for _, book := range bookList {
+		fmt.Println("Inserting book: ", book.Title)
 		bookdb.InsertBook(bookdb.Book(book))
 	}
 }

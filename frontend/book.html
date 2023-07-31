@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body onload="LoadInformation()">
-    <div class="book-info" id="bookInfo">
+    <div class="info-container" id="bookInfo">
         <!-- Book info will be dynamically added here -->
     </div>
 
@@ -40,35 +40,23 @@
                 });
         }
 
-        function displayBookInfo(searchResults) {
-            var searchResultsContainer = document.getElementById("bookInfo");
-            searchResultsContainer.innerHTML = ""; // Clear previous search results
+        function displayBookInfo(result) {
+            var infoContainer = document.getElementById("bookInfo");
+            infoContainer.innerHTML = ""; // Clear previous search results
 
-            // Check if searchResults is an array
-            if (Array.isArray(searchResults)) {
-                searchResults.forEach(function (result) {
-                    var resultDiv = document.createElement("div");
-                    resultDiv.classList.add("search-result");
-                    resultDiv.onclick = function () {
-                        window.location.href = "/book?title=" + result.Title;
-                    };
+            var resultDiv = document.createElement("div");
+            resultDiv.classList.add("book-info");
 
-                    var title = document.createElement("h2");
-                    title.textContent = result.Title;
+            var title = document.createElement("h2");
+            title.textContent = result.Title;
 
-                    var description = document.createElement("p");
-                    description.textContent = result.Description;
+            var description = document.createElement("p");
+            description.textContent = result.Description;
 
-                    resultDiv.appendChild(title);
-                    resultDiv.appendChild(description);
+            resultDiv.appendChild(title);
+            resultDiv.appendChild(description);
 
-                    searchResultsContainer.appendChild(resultDiv);
-                });
-            } else {
-                // If searchResults is not an array, display an appropriate message or handle the error.
-                console.error("Invalid search results format:", searchResults);
-                searchResultsContainer.innerHTML = "<p>No search results found.</p>";
-            }
+            infoContainer.appendChild(resultDiv);
         }
     </script>
 </body>

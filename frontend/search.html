@@ -65,7 +65,7 @@
                     var resultDiv = document.createElement("div");
                     resultDiv.classList.add("search-result");
                     resultDiv.onclick = function () {
-                        window.location.href = "/book.html?title=" + result.Title;
+                        window.location.href = "/book.html?title=" + encodeURIComponent(result.Title);
                     };
 
                     var title = document.createElement("h2");

@@ -2,6 +2,7 @@ package bookdb
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -28,7 +29,7 @@ var (
 )
 
 func ConnectDB() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", ":memory:")
+	db, err := sql.Open("sqlite3", "bookdb.db")
 
 	if err != nil {
 		LogError.Println(err)
@@ -83,6 +84,7 @@ func InsertBook(book Book) error {
 		cover_image, file_data) VALUES(?,?,?,?,?,?,?,?,?,?)`)
 	if err != nil {
 		LogError.Println("Unable to prepare for book insertion:\n\t", err)
+		fmt.Println("test1")
 		return err
 	}
 
@@ -103,6 +105,7 @@ func InsertBook(book Book) error {
 
 	if err != nil {
 		LogError.Println("Unable to insert book:\n\t", err)
+		fmt.Println("test2")
 		return err
 	}
 
