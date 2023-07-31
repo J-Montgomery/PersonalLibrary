@@ -67,7 +67,15 @@ func initDBTable(db *sql.DB) error {
 		author TEXT,
 		cover_image BLOB,
 		file_data BLOB
-	);`
+	);
+
+	CREATE VIRTUAL TABLE search_index USING FTS5(title, description);
+
+	CREATE TRIGGER after_book_insert AFTER INSERT ON books BEGIN
+		INSERT INTO search_index (title, description)
+		VALUES (new.title, new.description);
+	END;`
+
 	_, err := db.Exec(stm)
 
 	if err != nil {
