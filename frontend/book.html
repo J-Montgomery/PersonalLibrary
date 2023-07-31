@@ -3,44 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Search</title>
+    <title>Book Information</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body onload="initialSearch()">
-    <div class="top-bar">
-    <div class="search-bar-container">
-        <input type="text" class="search-bar" placeholder="Search for files...">
-        <button class="search-button" onclick="newSearch()">Search</button>
-    </div>
-    </div>
-
-    <div class="results-separator"></div>
-
-    <div class="search-results" id="searchResults">
-        <!-- Search results will be dynamically added here -->
+<body onload="LoadInformation()">
+    <div class="book-info" id="bookInfo">
+        <!-- Book info will be dynamically added here -->
     </div>
 
     <script>
-        function initialSearch() {
+        function LoadInformation() {
             let params = new URLSearchParams(document.location.search);
-            let searchQuery = params.get("query");
+            let infoQuery = params.get("title");
 
             // Set the search query to whatever's in the URL so
             // the user knows what the results are for
-            document.querySelector(".search-bar").value = searchQuery;
+            document.title = infoQuery + " Information";
 
-            performSearch(searchQuery);
+            getBookInfo(infoQuery);
         }
 
-        function newSearch() {
-            var searchQuery = document.querySelector(".search-bar").value;
-            console.log("searching for " + searchQuery)
-            performSearch(searchQuery);
-        }
+        function getBookInfo(query) {
 
-        function performSearch(query) {
-
-            fetch("/api/v1/search?q=" + encodeURIComponent(query))
+            fetch("/api/v1/info?q=" + encodeURIComponent(query))
                 .then(function (response) {
                     if (!response.ok) {
                         throw new Error("Network response was not ok");
@@ -48,15 +33,15 @@
                     return response.json();
                 })
                 .then(function (data) {
-                    displaySearchResults(data);
+                    displayBookInfo(data);
                 })
                 .catch(function (error) {
-                    console.error("Error fetching data:", error);
+                    console.error("Error fetching book info:", error);
                 });
         }
 
-        function displaySearchResults(searchResults) {
-            var searchResultsContainer = document.getElementById("searchResults");
+        function displayBookInfo(searchResults) {
+            var searchResultsContainer = document.getElementById("bookInfo");
             searchResultsContainer.innerHTML = ""; // Clear previous search results
 
             // Check if searchResults is an array
@@ -65,7 +50,7 @@
                     var resultDiv = document.createElement("div");
                     resultDiv.classList.add("search-result");
                     resultDiv.onclick = function () {
-                        window.location.href = "/book.html?title=" + result.Title;
+                        window.location.href = "/book?title=" + result.Title;
                     };
 
                     var title = document.createElement("h2");

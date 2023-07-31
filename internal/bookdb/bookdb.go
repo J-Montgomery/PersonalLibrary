@@ -108,3 +108,21 @@ func InsertBook(book Book) error {
 
 	return nil
 }
+
+func GetBook(title string) (Book, error) {
+	var book Book
+
+	stm, err := bookDB.Prepare(`SELECT 
+					title, description, author, 
+					cover_image FROM books WHERE title=?`)
+	if err != nil {
+		LogError.Println("Unable to prepare for book info read:\n\t", err)
+		return book, err
+	}
+
+	defer stm.Close()
+
+	stm.QueryRow(title).Scan(&book.Title, &book.Description, &book.Author, &book.CoverImage)
+
+	return book, nil
+}

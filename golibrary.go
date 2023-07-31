@@ -21,6 +21,7 @@ var (
 	LogInfo  *log.Logger
 	LogWarn  *log.Logger
 	LogError *log.Logger
+	bookList []Book
 )
 
 func CustomFileServer(root http.FileSystem, handler404 FSHandler404) http.Handler {
@@ -55,6 +56,7 @@ func CustomFileServer(root http.FileSystem, handler404 FSHandler404) http.Handle
 func init() {
 	initLoggers()
 	bookdb.Init()
+	initBooklist()
 }
 
 func main() {
@@ -63,6 +65,7 @@ func main() {
 
 	http.HandleFunc("/api/v1/search", handleSearch)
 	http.HandleFunc("/api/v1/upload", handleUpload)
+	http.HandleFunc("/api/v1/info", handleInfo)
 
 	LogInfo.Println("Server is running on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
@@ -73,23 +76,7 @@ func handlePageNotFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSearch(w http.ResponseWriter, r *http.Request) {
-	books := make([]Book, 3)
-	books[0] = Book{
-		Title:       "The Go Programming Language",
-		Description: "Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.",
-	}
-
-	books[1] = Book{
-		Title:       "The C Programming Language",
-		Description: "The original K&R C book by Brian W. Kernighan and Dennis M. Ritchie.",
-	}
-
-	books[2] = Book{
-		Title:       "The Rust Programming Language",
-		Description: "A crabby introduction to Rust.",
-	}
-
-	books_json, err := json.Marshal(books)
+	books_json, err := json.Marshal(bookList)
 	if err != nil {
 		LogError.Println("Converting books to json failed:\n\t", err)
 	}
@@ -115,6 +102,25 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, `[ {"Status": "Book successfully uploaded"} ]`)
+}
+
+func handleInfo(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Set("Content-Type", "application/json")
+	book, err := bookdb.GetBook(r.URL.Query().Get("title"))
+
+	if err != nil {
+		fmt.Fprintf(w, `[ {"Status": "Invalid Request"} ]`)
+		return
+	}
+
+	book_info_json, err := json.Marshal(book)
+	if err != nil {
+		LogError.Println("Converting book info to json failed:\n\t", err)
+		fmt.Fprintf(w, `[ {"Status": "Invalid Request"} ]`)
+	}
+
+	fmt.Fprintf(w, string(book_info_json))
 }
 
 func initLoggers() {
@@ -160,4 +166,26 @@ func makeBook(r *http.Request) (Book, error) {
 	book.FileData, _ = getBase64ParamBytes(r, "file")
 
 	return book, nil
+}
+
+func initBooklist() {
+	bookList = make([]Book, 3)
+	bookList[0] = Book{
+		Title:       "The Go Programming Language",
+		Description: "Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.",
+	}
+
+	bookList[1] = Book{
+		Title:       "The C Programming Language",
+		Description: "The original K&R C book by Brian W. Kernighan and Dennis M. Ritchie.",
+	}
+
+	bookList[2] = Book{
+		Title:       "The Rust Programming Language",
+		Description: "A crabby introduction to Rust.",
+	}
+
+	for _, book := range bookList {
+		bookdb.InsertBook(bookdb.Book(book))
+	}
 }
