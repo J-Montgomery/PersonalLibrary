@@ -1,4 +1,4 @@
-module golibrary
+module personallibrary
 
 go 1.20
 
