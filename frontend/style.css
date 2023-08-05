@@ -143,3 +143,21 @@ body {
 .cover-frame {
     box-shadow: 0 0 10px rgba(0, 0, 0, 1);
 }
+
+.upload-form {
+    flex-direction: column;
+}
+
+#drop_zone {
+    border: 1px solid var(--dark-mid);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    background: var(--light);
+    border-radius: 15px;
+    padding: 10px;
+    margin: 10px 0px;
+    width: 50%;
+}
+
+#drop_zone:hover {
+    background: var(--light-mid);
+}

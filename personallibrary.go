@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -92,8 +93,11 @@ func handleSearch(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleUpload(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Uploading book")
+
 	w.Header().Set("Content-Type", "application/json")
 
+	r.ParseMultipartForm(10 << 20)
 	book, err := makeBook(r)
 
 	if err != nil {
@@ -101,17 +105,34 @@ func handleUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = bookdb.InsertBook(bookdb.Book(book))
+	file, handler, err := r.FormFile("book-file")
 	if err != nil {
+		fmt.Println("Error Retrieving the File")
+		fmt.Println(err)
 		fmt.Fprintf(w, `[ {"Status": "Invalid Request"} ]`)
 		return
 	}
+	defer file.Close()
+	fmt.Printf("Uploaded File: %+v\n", handler.Filename)
+	fmt.Printf("File Size: %+v\n", handler.Size)
+	fmt.Printf("MIME Header: %+v\n", handler.Header)
 
-	fmt.Fprintf(w, `[ {"Status": "Book successfully uploaded"} ]`)
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		fmt.Println(err)
+	}
+	book.FileData = fileBytes
+
+	// err = bookdb.InsertBook(bookdb.Book(book))
+	// if err != nil {
+	// 	fmt.Fprintf(w, `[ {"Status": "Invalid Request"} ]`)
+	// 	return
+	// }
+
+	fmt.Fprintf(w, `[ {"Status": "%s successfully uploaded"} ]`, book.Title)
 }
 
 func handleInfo(w http.ResponseWriter, r *http.Request) {
-
 	// FileServer mangles query parameters randomly. title -> q, apparently
 	title := r.URL.Query().Get("q")
 	book, err := bookdb.GetBook(title)
@@ -149,29 +170,36 @@ func getBase64Param(r *http.Request, param string) (string, error) {
 
 func makeBook(r *http.Request) (Book, error) {
 	fmt.Println("Book params were:", r.URL.Query())
+	// body, err := io.ReadAll(r.Body)
+	// if err != nil {
+	// 	log.Printf("Error reading body: %v", err)
+	// }
+	// fmt.Println("Body:", string(body))
+	// fmt.Println(r.PostFormValue("book-title"))
 
 	var book Book
 
-	description, err := getBase64Param(r, "description")
-	if err != nil {
+	description := r.PostFormValue("book-description")
+	if description == "" {
 		description = "No description available"
 	}
 
-	pages, _ := getBase64Param(r, "pages")
+	pages := r.PostFormValue("book-pages")
 
 	book.UploadDate = time.Now()
 	book.Description = description
 	book.FileType = "epub"
 
 	book.Pages, _ = strconv.Atoi(pages)
-	book.Title, _ = getBase64Param(r, "title")
-	book.Author, _ = getBase64Param(r, "author")
-	book.Publisher, _ = getBase64Param(r, "publisher")
-	book.PublicationDate, _ = getBase64Param(r, "publisher")
+	book.Title = r.PostFormValue("book-title")
+	book.Author = r.PostFormValue("book-author")
+	book.Publisher = r.PostFormValue("book-publisher")
+	book.PublicationDate = r.PostFormValue("book-publication-date")
 
-	book.Description, _ = getBase64Param(r, "description")
-	book.CoverImage, _ = getBase64ParamBytes(r, "cover")
-	book.FileData, _ = getBase64ParamBytes(r, "file")
+	book.Description = r.PostFormValue("book-description")
+	// book.CoverImage, _ = r.PostFormValue("book-cover")
+
+	//book.FileData, _ = getBase64ParamBytes(r, "book-data")
 
 	return book, nil
 }

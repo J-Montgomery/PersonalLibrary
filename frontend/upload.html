@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="info-container" id="uploadContainer">
+        <form
+            enctype="multipart/form-data"
+            action="/api/v1/upload"
+            method="post"
+            class="upload-form">
+            <div><input type="text" class="Title" placeholder="Book title" name="book-title" /></div>
+            <div><input type="text" class="Author" placeholder="Author" name="book-author" /></div>
+            <div><textarea type="text" class="Description" placeholder="Description" cols="80" rows="10" name="book-description">
+            </textarea></div>
+
+            <!-- <div id="drop_zone"
+                ondrop="dropHandler(event);"
+                ondragover="dragOverHandler(event);">
+                <p>Drag one or more files to this <i>drop zone</i>.</p>
+            </div>               -->
+            <input type="file" name="book-file" />
+            <div></div><button class="search-button" type="submit">Submit</button></div>
+        </form>
+    </div>
+
+    <script>
+        function dropHandler(event) {
+            event.preventDefault();
+            console.log("File(s) dropped");
+        }
+        function dragOverHandler(ev) {
+            console.log("File(s) in drop zone");
+
+            // Prevent default behavior (Prevent file from being opened)
+            ev.preventDefault();
+        }
+
+    </script>
+</body>
+</html>
